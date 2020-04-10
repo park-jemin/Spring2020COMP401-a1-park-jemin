@@ -31,22 +31,15 @@ public class A1Primary {
 	 */
 	public static Customer[] customerData (Scanner scan, StoreItem[] storeItems) {
 		
-		// Constructs Customer array with an input of the total number of customers
 		Customer[] customers = new Customer[scan.nextInt()];
 		
-		// Loop to fill each Customer with Customer data
 		for (int i = 0; i < customers.length; i++) {
-			
-			// Builds Customer with an input of their name and the total number of items bought
+		
 			customers[i] = new Customer(scan.next(), scan.next(), scan.nextInt());
 			
-			// Loop to fill Item array in Customer object with each item's data
 			for (int j = 0; j < customers[i].items.length; j++) {
-				
 				int amount = scan.nextInt();
 				String name = scan.next();
-				
-				// Checks if store data has been given to determine method for finding price
 				double price = (storeItems.length == 0) ? scan.nextDouble() : priceSearch(amount, name, storeItems);
 				
 				customers[i].items[j] = new Item(amount, name, price);
@@ -54,7 +47,6 @@ public class A1Primary {
 				
 			}
 		}
-		
 		return customers;
 	}
 
@@ -74,14 +66,10 @@ public class A1Primary {
 	 */
 	public static StoreItem[] storeInventory (Scanner scan) {
 		
-		// Constructs StoreItem array given number of items
 		StoreItem[] storeItems = new StoreItem[scan.nextInt()];
-		
-		// Loop to build each store item with their respective names and prices
 		for (int i = 0; i < storeItems.length; i++) {
 			storeItems[i] = new StoreItem(scan.next(), scan.nextDouble());
 		}
-		
 		return storeItems;
 	}
 	
@@ -89,21 +77,18 @@ public class A1Primary {
 	 * Finds the price of a named item in the store and adds quantity purchased 
 	 * to the Store Item's purchase count
 	 *
-	 * Input: an integer of the number of this item purchased, the item name, and the store data
+	 * Input: the number of this item purchased as an int, the item name, and the store data
 	 * 
 	 * Output: the price found in the store as a double
 	 * Returns 0 if price not found
 	 */
 	public static double priceSearch (int count, String item, StoreItem[] storeItems) {
-		
-		for (int i = 0; i < storeItems.length; i++) {
-		
-			if (item.matches(storeItems[i].name)) {
-				storeItems[i].amount += count;
-				return storeItems[i].price;
+		for (StoreItem memo : storeItems) {
+			if (item.matches(memo.name)) {
+				memo.amount += count;
+				return memo.price;
 			}
 		}
-		
 		return 0;
 	}
 	
@@ -118,11 +103,9 @@ public class A1Primary {
 	public static double spendAverage (Customer[] customers) {
 		
 		double total = 0;
-		
-		for (int i=0; i < customers.length; i++) {
-			total += customers[i].spent;
+		for (Customer customer : customers) {
+			total += customer.spent;
 		}
-		
 		return (total/customers.length);
 	}
 
@@ -138,17 +121,15 @@ public class A1Primary {
 		
 		Customer memo = customers[0];
 		
-		if (key == "smallest") {
-			// Finds smallest spender and records it in memo
-			for (int i = 1; i < customers.length; i++) {
-				memo = (customers[i].spent < memo.spent) ? customers[i] : memo;
+		if (key.matches("smallest")) { // finds smallest spender
+			for (Customer customer : customers) {
+				memo = (customer.spent < memo.spent) ? customer : memo;
 			}
 			
 			
-		} else if (key == "biggest") {
-			// Finds biggest spender and records it in memo
-			for (int i = 1; i < customers.length; i++) {
-				memo = (customers[i].spent > memo.spent) ? customers[i] : memo;
+		} else if (key.matches("biggest")) { // finds biggest spender
+			for (Customer customer: customers) {
+				memo = (customer.spent > memo.spent) ? customer : memo;
 			}
 		}
 		
@@ -183,7 +164,7 @@ class Customer {
 	 * Used for A1Novice
 	 */
 	public String totalSpend () {
-		return this.first.charAt(0) + ". " + this.last + ": " + String.format("%.2f", this.spent);
+		return first.charAt(0) + ". " + last + ": " + String.format("%.2f", spent);
 	}	
 	
 	/* summary
@@ -197,7 +178,7 @@ class Customer {
 	 * Used for A1Adept 
 	 */
 	public String summary () {
-		return this.first + " " + this.last + " (" + String.format("%.2f", this.spent) + ")";
+		return first + " " + last + " (" + String.format("%.2f", spent) + ")";
 	}
 
 }
@@ -232,15 +213,12 @@ class StoreItem extends Item {
 	 * Returns the number of customers that purchased this item given customer set data 
 	 */
 	public int pplPurchased (Customer[] customers) {
-		
 		int count = 0;
-		
-		for (int i = 0; i < customers.length; i++) {
-			for (int j = 0; j < customers[i].items.length; j++) {
-				if (customers[i].items[j].name.matches(this.name)) {
-					count++; 
-					j += customers[i].items.length; 
-					// edge case accounting for repeat buys by same customer
+		for (Customer customer : customers) {
+			for (Item item : customer.items) {
+				if (item.name.matches(this.name)) {
+					count++;
+					break;
 				}
 			}
 		}
@@ -260,15 +238,7 @@ class StoreItem extends Item {
 	 * 		No customers bought ITEM
 	 */
 	public String salesReport (Customer[] customers) {
-		
-		int count = this.pplPurchased(customers);
-		String output = " customers bought ";
-		
-		if (count <= 0) {
-			return "No" + output + this.name;
-		}
-		
-		return count + output + this.amount + " " + this.name;
-	
+		int count = pplPurchased(customers);
+		return ((count <= 0) ? "No customers bought " : count + " customers bought " + amount + " ") + name;	
 	}
 }

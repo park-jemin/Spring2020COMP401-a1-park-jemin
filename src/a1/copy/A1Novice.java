@@ -1,4 +1,4 @@
-package a1;
+package a1.copy;
 
 import java.util.Scanner;
 
